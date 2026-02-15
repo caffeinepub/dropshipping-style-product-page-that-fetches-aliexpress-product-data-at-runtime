@@ -1,0 +1,56 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-14T14:13:14.190Z",
+  "summary": "Diff adds URL-parameterized product fetching, a two-section storefront page, embed-mode layout/navigation, and price overrides. However, backend URL validation for AliExpress product URLs is not shown, cart identity derived from URL is not guaranteed to distinguish two products with the same item id (and config uses the same URL twice), and the Shopify embedding instructions file appears incomplete in the provided diff.",
+  "missing_requirements": [
+    {
+      "id": "REQ-7",
+      "requirement": "Backend validates the URL to allow only AliExpress product-page URLs (reject non-AliExpress or non-http(s) URLs).",
+      "reason": "backend/main.mo adds fetchAliExpressProduct(url) but shows no validation logic; it forwards the URL directly to OutCall.httpGetRequest.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "requirement": "Ensure the cart can distinguish line items between the two displayed products even if the normalized AliExpress product id is the same, by using a stable per-product identifier derived from the source URL in the cart item’s productId (or equivalent approach).",
+      "reason": "deriveProductIdFromUrl() returns `aliexpress-<itemId>` when the URL matches /item/(\\d+).html, which will be identical for different source URLs that point to the same itemId. Additionally, the storefront config sets both products to the same AliExpress URL, which would make productId identical and cause unintended merging.",
+      "evidence": [
+        "frontend/src/lib/aliExpress/productIdentity.ts",
+        "frontend/src/components/product/ProductDetailSection.tsx",
+        "frontend/src/config/storefrontProducts.ts"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "requirement": "A short English README or in-app instructions describe how to embed the storefront in Shopify using an iframe snippet and what URL to use.",
+      "reason": "frontend/EMBEDDING_SHOPIFY.md is added but the diff content is truncated and only shows the heading and an unfinished 'Embed URL' section without the promised snippet/URL details.",
+      "evidence": [
+        "frontend/EMBEDDING_SHOPIFY.md"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.74,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/EMBEDDING_SHOPIFY.md",
+    "frontend/src/App.tsx",
+    "frontend/src/components/StorefrontLayout.tsx",
+    "frontend/src/components/product/ProductDetailSection.tsx",
+    "frontend/src/config/storefrontProducts.ts",
+    "frontend/src/hooks/useEmbedMode.ts",
+    "frontend/src/hooks/useEmbedNavigation.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/lib/aliExpress/productIdentity.ts",
+    "frontend/src/lib/aliExpress/productSource.ts",
+    "frontend/src/pages/CartPage.tsx",
+    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/src/pages/OrderConfirmationPage.tsx",
+    "frontend/src/pages/ProductPage.tsx",
+    "frontend/src/pages/StorefrontPage.tsx",
+    "project_state.json"
+  ]
+}

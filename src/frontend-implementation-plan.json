@@ -1,0 +1,184 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Two-product storefront with per-URL fetching, stable cart IDs, price overrides, and Shopify-embeddable mode",
+  "requirements": [
+    {
+      "id": "REQ-7",
+      "summary": "Allow the frontend to request fetched AliExpress product HTML for arbitrary product URLs at runtime (supporting multiple products).",
+      "acceptanceCriteria": [
+        "Backend exposes a method that accepts an AliExpress product URL string and returns the fetched HTML (or an error)",
+        "Backend validates the URL to allow only AliExpress product-page URLs (reject non-AliExpress or non-http(s) URLs)",
+        "Existing single-product flow continues to work (the current product page still loads successfully)"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/aliExpress/productSource.ts",
+          "operation": "modify",
+          "description": "Update the product HTML fetch utility to accept a URL parameter and call the backend actor method with that URL; keep a backwards-compatible default export/path so existing callers still work."
+        },
+        {
+          "path": "frontend/src/pages/ProductPage.tsx",
+          "operation": "modify",
+          "description": "Refactor the current single-product page logic so it can still render successfully using a configured default AliExpress URL, while delegating URL-specific behavior to the updated fetch hook/utilities."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Update product fetching hooks/utilities to fetch+normalize per AliExpress URL and cache per-URL with React Query; ensure independent loading/error states per product.",
+      "acceptanceCriteria": [
+        "A product fetch hook/function accepts a URL parameter and uses a React Query key that includes the URL (e.g., ['product', url])",
+        "The normalized ProductModel returned is derived from the fetched HTML as before",
+        "Loading/error UI works independently per product fetch (one product failing does not prevent the other from rendering a usable state)"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Change the product fetch hook to accept a URL parameter and use a URL-scoped React Query key (e.g., ['product', url]); ensure errors are surfaced per-hook call rather than globally."
+        },
+        {
+          "path": "frontend/src/lib/aliExpress/productSource.ts",
+          "operation": "modify",
+          "description": "Ensure the product-source utility supports fetching by URL and returns raw HTML for normalization; keep default URL constants only for legacy/single-product usage."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Render two AliExpress products as full product detail sections on the existing “/” route, each with independent quantity and Add to Cart.",
+      "acceptanceCriteria": [
+        "The “/” page displays two distinct product sections on the same page (not a separate route)",
+        "Each section includes an image gallery, title, price display, description, and any available shipping/returns/reviews using existing components",
+        "Each product section has its own quantity control and its own Add to Cart button",
+        "Clicking Add to Cart for either product adds the correct product to the cart without overwriting the other product’s cart line item"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/config/storefrontProducts.ts",
+          "operation": "create",
+          "description": "Add a small configuration module defining two product entries (AliExpress URLs + optional display price override + display name if needed) to drive rendering on the “/” page."
+        },
+        {
+          "path": "frontend/src/components/product/ProductDetailSection.tsx",
+          "operation": "create",
+          "description": "Extract the existing product detail UI from ProductPage into a reusable section component that takes a product URL/config, renders loading/error states locally, and composes existing components (ImageGallery, ProductDescription, ReviewsSection, ShippingReturns). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/StorefrontPage.tsx",
+          "operation": "create",
+          "description": "Create a new storefront page for “/” that renders two ProductDetailSection instances (one per configured product), each managing its own quantity and Add to Cart action."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the “/” route to use StorefrontPage (two-product view) while keeping existing cart/checkout/confirmation routes unchanged."
+        },
+        {
+          "path": "frontend/src/pages/ProductPage.tsx",
+          "operation": "modify",
+          "description": "Update the existing ProductPage to reuse ProductDetailSection (or share extracted logic) so the original single-product rendering remains functional and consistent with the new section UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "Prevent unintended cart line-item merging by using a stable per-product identifier derived from the source URL for cart productId (and keep persistence stable).",
+      "acceptanceCriteria": [
+        "Adding both products results in two separate cart line items (not merged unintentionally)",
+        "Cart item keys remain stable across refreshes (localStorage persistence continues to work)",
+        "Remove/update quantity operations in the cart still function correctly for each line item"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/aliExpress/productIdentity.ts",
+          "operation": "create",
+          "description": "Implement a stable deterministic helper to derive a cart-safe productId from an AliExpress source URL (e.g., normalized URL + stable hash), suitable for use as the cart line item key."
+        },
+        {
+          "path": "frontend/src/components/product/ProductDetailSection.tsx",
+          "operation": "modify",
+          "description": "Use the per-URL derived productId (from productIdentity.ts) when calling addItem so that two different URLs always map to distinct cart items even if normalized product.id collides."
+        },
+        {
+          "path": "frontend/src/pages/CartPage.tsx",
+          "operation": "modify",
+          "description": "Ensure cart rendering and item operations continue to use productId+variantId keys and remain stable with the new derived IDs (no UI assumptions tied to AliExpress normalized product.id)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "summary": "Add optional per-product display price override (second product shows $160) and ensure cart calculations use the override price when set.",
+      "acceptanceCriteria": [
+        "The storefront page defines two product entries; the second entry includes a price override of 160 USD",
+        "When a price override is set, the UI displays $160.00 for that product and uses $160.00 for cart calculations for that product",
+        "When no override is set, the UI displays and uses the runtime-fetched price as it does today"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/config/storefrontProducts.ts",
+          "operation": "modify",
+          "description": "Add a display price override field to the product configuration; set the second product to a 160 USD override."
+        },
+        {
+          "path": "frontend/src/components/product/ProductDetailSection.tsx",
+          "operation": "modify",
+          "description": "Implement effective price selection (override when present; otherwise fetched price) for both the displayed price and the value passed into the cart item snapshot so subtotal/checkout totals reflect overrides."
+        },
+        {
+          "path": "frontend/src/cart/useCart.tsx",
+          "operation": "modify",
+          "description": "Confirm subtotal and quantity update logic uses the stored cart item price field (already persisted) so override-based cart calculations remain correct across refreshes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "summary": "Add an embeddable storefront mode for Shopify iframe use (minimal chrome) and document embed instructions.",
+      "acceptanceCriteria": [
+        "App supports an embeddable view mode (e.g., via a query param like ?embed=1 or a dedicated route) that hides header/footer and fits cleanly in an iframe",
+        "Embed mode still supports viewing products, adding to cart, and completing checkout within the embedded experience",
+        "A short English README or in-app instructions describe how to embed the storefront in Shopify using an iframe snippet and what URL to use"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useEmbedMode.ts",
+          "operation": "create",
+          "description": "Create a small hook that detects embeddable mode (e.g., via the embed=1 query parameter) so pages/layout can conditionally adjust chrome and navigation behavior."
+        },
+        {
+          "path": "frontend/src/hooks/useEmbedNavigation.ts",
+          "operation": "create",
+          "description": "Create a helper hook/wrapper for router navigation that preserves the embed=1 query parameter across internal navigations when embed mode is active."
+        },
+        {
+          "path": "frontend/src/components/StorefrontLayout.tsx",
+          "operation": "modify",
+          "description": "Add embed mode rendering: hide the standard header/footer and replace with minimal UI suitable for an iframe while keeping cart access visible; preserve English text. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/CartPage.tsx",
+          "operation": "modify",
+          "description": "Update navigation actions (continue shopping / proceed to checkout) to preserve embed mode query params so the embedded experience remains minimal throughout the cart flow."
+        },
+        {
+          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "operation": "modify",
+          "description": "Update navigation actions (back to cart and any redirects) to preserve embed mode query params so checkout remains inside the embedded minimal-chrome experience."
+        },
+        {
+          "path": "frontend/src/pages/OrderConfirmationPage.tsx",
+          "operation": "modify",
+          "description": "Update navigation back to shopping to preserve embed mode query params so confirmation remains consistent inside the iframe."
+        },
+        {
+          "path": "frontend/EMBEDDING_SHOPIFY.md",
+          "operation": "create",
+          "description": "Add short English documentation with an iframe snippet and the exact URL format to use (including ?embed=1), plus any notes about sizing and allowing scrolling."
+        }
+      ]
+    }
+  ]
+}

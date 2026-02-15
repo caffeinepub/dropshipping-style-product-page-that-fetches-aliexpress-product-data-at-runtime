@@ -1,0 +1,143 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-14T14:13:14.194Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 6,
+    "implemented": 6,
+    "items": [
+      {
+        "id": "REQ-10",
+        "summary": "Ensure the cart can distinguish line items between the two displayed products even if the normalized AliExpress product id is the same, by using a stable per-product identifier derived from the source URL in the cart item’s productId (or equivalent approach).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/aliExpress/productIdentity.ts",
+          "frontend/src/components/product/ProductDetailSection.tsx",
+          "frontend/src/pages/CartPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/aliExpress/productIdentity.ts",
+          "frontend/src/components/product/ProductDetailSection.tsx",
+          "frontend/src/pages/CartPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-11",
+        "summary": "Add an optional per-product “display price override” configuration so the second product can be shown as $160 even when runtime-fetched pricing differs or is missing.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/config/storefrontProducts.ts",
+          "frontend/src/components/product/ProductDetailSection.tsx",
+          "frontend/src/cart/useCart.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/config/storefrontProducts.ts",
+          "frontend/src/components/product/ProductDetailSection.tsx"
+        ]
+      },
+      {
+        "id": "REQ-12",
+        "summary": "Make the storefront usable in Shopify by providing an embeddable mode of the storefront (minimal chrome) suitable for being placed in a Shopify page via iframe, including documented embed instructions.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useEmbedMode.ts",
+          "frontend/src/hooks/useEmbedNavigation.ts",
+          "frontend/src/components/StorefrontLayout.tsx",
+          "frontend/src/pages/CartPage.tsx",
+          "frontend/src/pages/CheckoutPage.tsx",
+          "frontend/src/pages/OrderConfirmationPage.tsx",
+          "frontend/EMBEDDING_SHOPIFY.md"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useEmbedMode.ts",
+          "frontend/src/hooks/useEmbedNavigation.ts",
+          "frontend/src/components/StorefrontLayout.tsx",
+          "frontend/src/pages/CartPage.tsx",
+          "frontend/src/pages/CheckoutPage.tsx",
+          "frontend/src/pages/OrderConfirmationPage.tsx",
+          "frontend/EMBEDDING_SHOPIFY.md"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Support fetching AliExpress product HTML for an arbitrary product URL (not hard-coded) so the frontend can request multiple products at runtime.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/aliExpress/productSource.ts",
+          "frontend/src/pages/ProductPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/aliExpress/productSource.ts",
+          "frontend/src/pages/ProductPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Update the product data fetching hooks/utilities to fetch and normalize product data for a given AliExpress URL, and cache results per-URL.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/lib/aliExpress/productSource.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/lib/aliExpress/productSource.ts"
+        ]
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Render two products on the same main storefront page (the current “/” route), each as a full product detail section (images, title, price, description, etc.) with independent quantity selection and Add to Cart actions.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/config/storefrontProducts.ts",
+          "frontend/src/components/product/ProductDetailSection.tsx",
+          "frontend/src/pages/StorefrontPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/ProductPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/config/storefrontProducts.ts",
+          "frontend/src/components/product/ProductDetailSection.tsx",
+          "frontend/src/pages/StorefrontPage.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/ProductPage.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "build-request.json",
+    "build-template/README.md",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/EMBEDDING_SHOPIFY.md",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/StorefrontLayout.tsx",
+    "frontend/src/components/product/ProductDetailSection.tsx",
+    "frontend/src/config/storefrontProducts.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useEmbedMode.ts",
+    "frontend/src/hooks/useEmbedNavigation.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/lib/aliExpress/productIdentity.ts",
+    "frontend/src/lib/aliExpress/productSource.ts",
+    "frontend/src/pages/CartPage.tsx",
+    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/src/pages/OrderConfirmationPage.tsx",
+    "frontend/src/pages/ProductPage.tsx",
+    "frontend/src/pages/StorefrontPage.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

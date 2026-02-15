@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "Extend the dropshipping product page to support displaying multiple products (including a second product fetched from an AliExpress URL) on the same page, with shared cart + checkout, and ensure the setup is usable in Shopify.",
+  "architectural_notes": [
+    "Product data should be fetched from the AliExpress product URL at runtime (not hard-coded).",
+    "Page should include full dropshipping flow: product display + cart + checkout.",
+    "Support rendering multiple products on the same page (multi-product layout) while using a shared cart + checkout flow.",
+    "Target a Shopify-usable setup (Shopify-compatible integration/deployment constraints)."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-create-a-product-page-that-fetches-product-data-at-runtime-from-the-specific-aliexpress-product-url-https-www-aliexpress-com-item-1005006574626248-html-and-renders-a-full-product-detail-page-using-the-fetched-data",
+      "title": "Create a product page that fetches product data at runtime from the specific AliExpress product URL: https://www.aliexpress.com/item/1005006574626248.html, and renders a full product detail page using the fetched data.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-on-the-product-page-display-all-typical-product-elements-derived-from-the-runtime-fetched-data-title-price-discount-if-present-image-gallery-description-variants-options-e-g-color-size-reviews-ratings-shipping-returns-info-if-available-and-related-details-present-in-the-fetched-data",
+      "title": "On the product page, display all typical product elements derived from the runtime-fetched data: title, price, discount (if present), image gallery, description, variants/options (e.g., color/size), reviews/ratings, shipping/returns info if available, and related details present in the fetched data.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dropshipping-style-cart-flow-allow-adding-the-currently-selected-product-variant-with-quantity-to-a-cart-viewing-editing-the-cart-and-persisting-the-cart-for-the-current-user-session",
+      "title": "Add a dropshipping-style cart flow: allow adding the currently selected product/variant with quantity to a cart, viewing/editing the cart, and persisting the cart for the current user session.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-simple-checkout-experience-no-external-payment-processor-collect-basic-customer-shipping-fields-show-an-order-summary-and-allow-placing-an-order-that-is-stored-in-the-backend",
+      "title": "Add a simple checkout experience (no external payment processor): collect basic customer/shipping fields, show an order summary, and allow placing an order that is stored in the backend.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-distinct-visual-theme-for-a-modern-dropshipping-storefront-and-apply-it-consistently-across-product-cart-and-checkout-screens-avoid-blue-purple-as-the-primary-palette",
+      "title": "Create a coherent, distinct visual theme for a modern dropshipping storefront and apply it consistently across product, cart, and checkout screens (avoid blue/purple as the primary palette).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-support-fetching-aliexpress-product-html-for-an-arbitrary-product-url-not-hard-coded-so-the-frontend-can-request-multiple-products-at-runtime",
+      "title": "Support fetching AliExpress product HTML for an arbitrary product URL (not hard-coded) so the frontend can request multiple products at runtime.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-product-data-fetching-hooks-utilities-to-fetch-and-normalize-product-data-for-a-given-aliexpress-url-and-cache-results-per-url",
+      "title": "Update the product data fetching hooks/utilities to fetch and normalize product data for a given AliExpress URL, and cache results per-URL.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-render-two-products-on-the-same-main-storefront-page-the-current-route-each-as-a-full-product-detail-section-images-title-price-description-etc-with-independent-quantity-selection-and-add-to-cart-actions",
+      "title": "Render two products on the same main storefront page (the current “/” route), each as a full product detail section (images, title, price, description, etc.) with independent quantity selection and Add to Cart actions.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-cart-can-distinguish-line-items-between-the-two-displayed-products-even-if-the-normalized-aliexpress-product-id-is-the-same-by-using-a-stable-per-product-identifier-derived-from-the-source-url-in-the-cart-item-s-productid-or-equivalent-approach",
+      "title": "Ensure the cart can distinguish line items between the two displayed products even if the normalized AliExpress product id is the same, by using a stable per-product identifier derived from the source URL in the cart item’s productId (or equivalent approach).",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-optional-per-product-display-price-override-configuration-so-the-second-product-can-be-shown-as-160-even-when-runtime-fetched-pricing-differs-or-is-missing",
+      "title": "Add an optional per-product “display price override” configuration so the second product can be shown as $160 even when runtime-fetched pricing differs or is missing.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-storefront-usable-in-shopify-by-providing-an-embeddable-mode-of-the-storefront-minimal-chrome-suitable-for-being-placed-in-a-shopify-page-via-iframe-including-documented-embed-instructions",
+      "title": "Make the storefront usable in Shopify by providing an embeddable mode of the storefront (minimal chrome) suitable for being placed in a Shopify page via iframe, including documented embed instructions.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Full dropshipping-style product page that fetches all product data (title, price, images, description, variants, reviews, etc.) from an AliExpress URL at runtime, with cart and checkout",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement a backend proxy endpoint that performs the runtime fetch of the AliExpress product page (or underlying data endpoint) and returns a structured product payload to the frontend.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Support a second product on the same page, fetched at runtime from an AliExpress URL, and ensure it can be added to cart and purchased via the existing checkout flow",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Make the implementation usable in Shopify (Shopify-compatible integration/deployment approach)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Dropshipping-style product page that fetches AliExpress product data at runtime with cart + checkout",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

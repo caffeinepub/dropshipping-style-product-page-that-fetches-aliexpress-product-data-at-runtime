@@ -1,0 +1,142 @@
+{
+  "kind": "build_request",
+  "title": "Add a second AliExpress-fetched product to the same storefront page, shared cart/checkout, and Shopify-embeddable view",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-7",
+      "text": "Support fetching AliExpress product HTML for an arbitrary product URL (not hard-coded) so the frontend can request multiple products at runtime.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-8",
+          "msg-14"
+        ],
+        "quotes": [
+          "Yes this url\nhttps://www.aliexpress.com/item/1005006574626248.html",
+          "Build it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend exposes a method that accepts an AliExpress product URL string and returns the fetched HTML (or an error)",
+        "Backend validates the URL to allow only AliExpress product-page URLs (reject non-AliExpress or non-http(s) URLs)",
+        "Existing single-product flow continues to work (the current product page still loads successfully)"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Update the product data fetching hooks/utilities to fetch and normalize product data for a given AliExpress URL, and cache results per-URL.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-8",
+          "msg-14"
+        ],
+        "quotes": [
+          "Yes this url\nhttps://www.aliexpress.com/item/1005006574626248.html",
+          "Build it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A product fetch hook/function accepts a URL parameter and uses a React Query key that includes the URL (e.g., ['product', url])",
+        "The normalized ProductModel returned is derived from the fetched HTML as before",
+        "Loading/error UI works independently per product fetch (one product failing does not prevent the other from rendering a usable state)"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Render two products on the same main storefront page (the current “/” route), each as a full product detail section (images, title, price, description, etc.) with independent quantity selection and Add to Cart actions.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1",
+          "msg-5",
+          "msg-14"
+        ],
+        "quotes": [
+          "Can u add a led lighting strop worth 160$ with pictures and prices to the same page",
+          "1.second product",
+          "Build it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The “/” page displays two distinct product sections on the same page (not a separate route)",
+        "Each section includes an image gallery, title, price display, description, and any available shipping/returns/reviews using existing components",
+        "Each product section has its own quantity control and its own Add to Cart button",
+        "Clicking Add to Cart for either product adds the correct product to the cart without overwriting the other product’s cart line item"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Ensure the cart can distinguish line items between the two displayed products even if the normalized AliExpress product id is the same, by using a stable per-product identifier derived from the source URL in the cart item’s productId (or equivalent approach).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1",
+          "msg-8"
+        ],
+        "quotes": [
+          "Can u add a led lighting strop worth 160$ with pictures and prices to the same page",
+          "Yes this url\nhttps://www.aliexpress.com/item/1005006574626248.html"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Adding both products results in two separate cart line items (not merged unintentionally)",
+        "Cart item keys remain stable across refreshes (localStorage persistence continues to work)",
+        "Remove/update quantity operations in the cart still function correctly for each line item"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Add an optional per-product “display price override” configuration so the second product can be shown as $160 even when runtime-fetched pricing differs or is missing.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "Can u add a led lighting strop worth 160$ with pictures and prices to the same page"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The storefront page defines two product entries; the second entry includes a price override of 160 USD",
+        "When a price override is set, the UI displays $160.00 for that product and uses $160.00 for cart calculations for that product",
+        "When no override is set, the UI displays and uses the runtime-fetched price as it does today"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Make the storefront usable in Shopify by providing an embeddable mode of the storefront (minimal chrome) suitable for being placed in a Shopify page via iframe, including documented embed instructions.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-13"
+        ],
+        "quotes": [
+          "It should be useabke in shopofy"
+        ]
+      },
+      "acceptanceCriteria": [
+        "App supports an embeddable view mode (e.g., via a query param like ?embed=1 or a dedicated route) that hides header/footer and fits cleanly in an iframe",
+        "Embed mode still supports viewing products, adding to cart, and completing checkout within the embedded experience",
+        "A short English README or in-app instructions describe how to embed the storefront in Shopify using an iframe snippet and what URL to use"
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor with all logic in backend/main.mo; only add migration logic if a state upgrade is required.",
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui (compose instead).",
+    "Use English for all user-facing text.",
+    "No third-party authentication providers; only Internet Identity if auth is needed.",
+    "No external databases or non-IC backend services."
+  ],
+  "nonGoals": [
+    "Building a native Shopify app (OAuth install flow, Shopify Admin API integration, app billing, or Shopify checkout integration).",
+    "Integrating a real payment processor (Stripe/PayPal/etc.).",
+    "Real-time features (WebSockets/live chat/push notifications)."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
